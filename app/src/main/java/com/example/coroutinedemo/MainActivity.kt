@@ -66,7 +66,6 @@ class MainActivity : AppCompatActivity() {
         GlobalScope.launch(Dispatchers.Main) {
             Log.d("222","~~~enter in coroutine~~~")
 
-
             delay(8000)
             withContext(Dispatchers.Main){
                 tvChangeText.text="final"
