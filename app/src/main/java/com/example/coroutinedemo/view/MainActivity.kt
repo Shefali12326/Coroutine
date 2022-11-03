@@ -1,26 +1,38 @@
-package com.example.coroutinedemo
+package com.example.coroutinedemo.view
 
+import android.arch.lifecycle.Observer
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
+import com.example.coroutinedemo.R
+import com.example.coroutinedemo.viewmodel.UserViewModel
+import com.google.gson.Gson
 import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity() {
     lateinit var tvChangeText:TextView
+    var userViewModel=UserViewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initialize()
-        initateCoroutine()
-        callParallelFun()
-        waitForSpecificJob()
+//        initateCoroutine()
+//        callParallelFun()
+//        waitForSpecificJob()
         retrofitApiCall()
+        attachObserver()
+    }
+
+    private fun attachObserver() {
+        userViewModel.userData.observe(this, Observer {
+            Log.d("222","~~~userData~~~"+Gson().toJson(it))
+        })
     }
 
     private fun retrofitApiCall() {
-
+        Log.d("222","~~~retrofitApiCall~~~")
+        userViewModel.callApi()
     }
 
     private fun waitForSpecificJob() {
@@ -77,3 +89,5 @@ class MainActivity : AppCompatActivity() {
 
     }
 }
+
+//https://medium.com/android-beginners/mvvm-with-kotlin-coroutines-and-retrofit-example-d3f5f3b09050
