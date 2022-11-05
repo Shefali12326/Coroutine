@@ -17,9 +17,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initialize()
-//        initateCoroutine()
-//        callParallelFun()
-//        waitForSpecificJob()
+        initateCoroutine()
+        callParallelFun()
+        waitForSpecificJob()
         retrofitApiCall()
         attachObserver()
     }
@@ -28,6 +28,14 @@ class MainActivity : AppCompatActivity() {
         userViewModel.userData.observe(this, Observer {
             Log.d("222","~~~userData~~~"+Gson().toJson(it))
         })
+
+        userViewModel.isLoading.observe(this, Observer {
+            Log.d("222","~~~isLoading~~~"+it)
+        })
+        userViewModel.apiError.observe(this, Observer {
+            Log.d("222","~~~apiError~~~"+it)
+        })
+
     }
 
     private fun retrofitApiCall() {
