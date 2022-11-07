@@ -9,6 +9,8 @@ import com.example.coroutinedemo.R
 import com.example.coroutinedemo.viewmodel.UserViewModel
 import com.google.gson.Gson
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
 
 class MainActivity : AppCompatActivity() {
     lateinit var tvChangeText:TextView
@@ -22,6 +24,20 @@ class MainActivity : AppCompatActivity() {
         waitForSpecificJob()
         retrofitApiCall()
         attachObserver()
+
+        //coroutine with flow
+        producerFlow()
+        consumerOfFlow()//cold flow
+        producerByChannel()//hot observable
+        consumerOfChannel()
+        producerOfSharedFlow()
+        consumerOfSharedFlow() //hot nature flow
+        producerOfStateFlow()
+        consumerOfStateFlow()//hot flow
+        //shared flow ->multiple consumers support, not have state to store current val
+        //state flow->multiple consumers support, have start so last join consumer can still get recent value no lost
+
+
     }
 
     private fun attachObserver() {
@@ -96,6 +112,150 @@ class MainActivity : AppCompatActivity() {
         Log.d("222","~~~outside coroutine~~~")
 
     }
+
+    //coroutine with flow
+    private fun consumerOfStateFlow() {
+        var job1 = GlobalScope.launch {
+            val data: Flow<Int> = producerOfStateFlow()
+            delay(6000)
+            data.collect {
+                Log.d("222", "~~consumerOfStateFlow~+" + it)
+
+            }
+
+        }
+    }
+    private fun producerOfStateFlow() : StateFlow<Int> {
+        val mutableStateFlow = MutableStateFlow<Int>(10)
+//        var list = listOf<Int>(1, 2, 3, 4)
+        GlobalScope.launch {
+            delay(2000)
+            mutableStateFlow.emit(20)
+            delay(2000)
+            mutableStateFlow.emit(30)
+        }
+        return mutableStateFlow
+    }
+
+    private fun producerOfSharedFlow() : Flow<Int> {
+        val mutableSharedFlow = MutableSharedFlow<Int>(1)
+        var list = listOf<Int>(1, 2, 3, 4)
+        GlobalScope.launch {
+            list.forEach {
+//
+                mutableSharedFlow.emit(it)
+                delay(1000)
+            }
+        }
+        return mutableSharedFlow
+    }
+    private fun consumerOfSharedFlow() {
+        var job1=  GlobalScope.launch {
+            val data: Flow<Int> =producerOfSharedFlow()
+            delay(1000)
+            data.collect {
+                Log.d("222","~~consumerOfSharedFlow~first+"+it)
+
+            }
+
+            var job1=  GlobalScope.launch {
+                val data: Flow<Int> =producerOfSharedFlow()
+                delay(8000)
+                data.collect {
+                    Log.d("222","~~consumerOfSharedFlow~second+"+it)
+
+                }
+            }}}
+
+
+    private fun consumerOfChannel() {
+        GlobalScope.launch(Dispatchers.IO) {
+
+//           channel.receive()
+//           channel.receive()
+            Log.d("222","~~consumerOfChannel~+"+channel.receive().toString())
+            Log.d("222","~~consumerOfChannel~+"+channel.receive().toString())
+        }
+    }
+
+    val channel= Channel<Int>()
+    private fun producerByChannel() {
+        GlobalScope.launch(Dispatchers.IO) {
+            channel.send(1)
+            channel.send(2)
+        }
+    }
+
+    //with events
+    private fun consumerOfFlow() {
+        //if not collect then producer not produce until consumer not there, cancel by default
+        var job=  GlobalScope.launch {
+            val data: Flow<Int> =producerFlow()// direct method
+
+            //########### with filter ######## flowOn to indicste thread above
+            try{
+                producerFlow().map { it*2 }
+                    .filter { it>0 }.flowOn(Dispatchers.IO).collect{
+
+                    }
+            }catch (E:Exception){
+
+            }
+//######################### with events   start ###########################
+//            producerFlow().
+//            onStart {
+//                emit(-1)
+//                 Log.d("222","~~consumerOfFlow~onStart+")
+//
+//             }.
+//            onCompletion {
+//                 Log.d("222","~~consumerOfFlow~onCompletion+")
+//             emit(5)
+//             }
+//                    .onEach {
+//                 Log.d("222","~~consumerOfFlow~onEach+"+it)
+//             }.collect {
+//                 Log.d("222","~~consumerOfFlow~first+"+it)
+//
+//             }
+
+
+//######################### with events  end  ###########################
+            data .collect {
+                Log.d("222","~~consumerOfFlow~first+"+it)
+
+            }
+        }
+
+//multiple consumer
+        var job1=  GlobalScope.launch {
+            val data: Flow<Int> =producerFlow()
+            delay(1000)
+            data.collect {
+                Log.d("222","~~consumerOfFlow~second+"+it)
+
+            }
+        }
+
+        //for cancel
+//        GlobalScope.launch {
+//            delay(3000)
+//            job.cancel();
+//        }
+
+    }
+
+    fun producerFlow()=flow<Int> {
+        var list= listOf<Int>(1,2,3,4)
+        list.forEach {
+            delay(1000)
+            emit(it)
+        }
+
+    }
+
+
+
 }
 
 //https://medium.com/android-beginners/mvvm-with-kotlin-coroutines-and-retrofit-example-d3f5f3b09050
