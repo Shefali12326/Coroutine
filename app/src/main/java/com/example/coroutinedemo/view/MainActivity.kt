@@ -34,8 +34,49 @@ class MainActivity : AppCompatActivity() {
         consumerOfSharedFlow() //hot nature flow
         producerOfStateFlow()
         consumerOfStateFlow()//hot flow
+        apiCallWithFlow()
         //shared flow ->multiple consumers support, not have state to store current val
         //state flow->multiple consumers support, have start so last join consumer can still get recent value no lost
+
+//        funExtens
+        funForExtensionFun()
+    }
+
+    private fun funForExtensionFun() {
+
+        //for custom
+        class Draw(var radius:Int){
+            fun area():Double{
+            return Math.PI*radius*radius
+            }
+
+        }
+
+        //fun extensibility
+       fun Draw.perimeter():Double{
+           return 2*Math.PI*radius
+        }
+
+       var draw= Draw(3);
+
+        Log.d("222","~~funForExtensionFun~~"+draw.area())
+        Log.d("222","~~funForExtensionFun~~"+draw.perimeter())
+
+
+
+        //for library class
+        fun  Int.abs( no:Int):Int{
+            Log.d("222","~~funForExtensionFun~~"+this)
+            return if(this<0) this else -this
+
+    }
+        var i=int()
+        Log.d("222","~~funForExtensionFun~~library"+i.abs(4))
+
+    }
+
+    private fun apiCallWithFlow() {
+
 
 
     }
@@ -256,6 +297,9 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
+
 }
 
 //https://medium.com/android-beginners/mvvm-with-kotlin-coroutines-and-retrofit-example-d3f5f3b09050
+//https://amitshekhar.me/blog/retrofit-with-kotlin-flow
