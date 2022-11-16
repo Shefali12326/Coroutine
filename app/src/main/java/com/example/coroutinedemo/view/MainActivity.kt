@@ -39,8 +39,34 @@ class MainActivity : AppCompatActivity() {
         //state flow->multiple consumers support, have start so last join consumer can still get recent value no lost
 
 //        funExtens
-        funForExtensionFun()
+        funForExtensionFun()//overriding
+        funDefaultParameter()//overloading
+        defaultParameter()
+
     }
+
+    //############################# default & Named Parameter ##########
+    private fun defaultParameter(str:String="default",keyValue:Int=8) {
+         Log.d("222","~~str~~~"+str+keyValue)
+    }
+
+    private fun funDefaultParameter() {
+        defaultParameter()
+        defaultParameter("First parameter send")
+//        defaultParameter(5)
+        //Named argument
+        student("22",roll_no=2,standard="standard")//if want to jump parameter send thing then need to specify arg name
+        student("22",roll_no=2)//even sequence doesn't matter if use Named argument
+
+    }
+
+    fun student( name: String="Praveen", standard: String="IX" , roll_no: Int=11 ) {
+        Log.d("222","Name of the student is: $name")
+        Log.d("222","Standard of the student is: $standard")
+        Log.d("222","Roll no of the student is: $roll_no")
+    }
+
+    //############################# default & Named Parameter ##########
 
     private fun funForExtensionFun() {
 
@@ -67,10 +93,12 @@ class MainActivity : AppCompatActivity() {
         //for library class
         fun  Int.abs( no:Int):Int{
             Log.d("222","~~funForExtensionFun~~"+this)
-            return if(this<0) this else -this
+            return if(no<0) this else -no
 
     }
-        var i=int()
+//        var i=int()
+        var i:Int=9
+
         Log.d("222","~~funForExtensionFun~~library"+i.abs(4))
 
     }
